@@ -1,0 +1,2 @@
+pytest>=8.0
+# Adicione aqui apenas as bibliotecas autorizadas no CONTEXT_RULES.md / SDD

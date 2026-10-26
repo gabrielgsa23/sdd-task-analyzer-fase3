@@ -1,0 +1,36 @@
+# Contrato executável do TaskAnalyzer em formato legível por máquina.
+# Fonte de verdade textual: specs/system_design_document.pdf
+module: task_analyzer
+function: analyze_tasks
+exception: TaskValidationError
+python: ">=3.11"
+allowed_priorities: [Baixa, Média, Alta]
+allowed_status: [Pendente, Concluída]
+
+inputs:
+  - {field: id, type: int, required: true, unique: true}
+  - {field: titulo, type: str, required: true}
+  - {field: prioridade, type: str, required: true}
+  - {field: data_criacao, type: datetime | ISO 8601 str, required: true}
+  - {field: prazo_limite, type: datetime | ISO 8601 str, required: true}
+  - {field: data_conclusao, type: datetime | ISO 8601 str | None, required: false}
+  - {field: status, type: str, required: true}
+
+outputs:
+  - total_tarefas
+  - total_concluidas
+  - total_pendentes
+  - tempo_medio_conclusao_horas   # geral, Baixa, Média, Alta
+  - taxa_atraso_percentual        # geral, Baixa, Média, Alta
+  - indicadores_prioridade        # Baixa, Média, Alta
+
+rules:
+  - Métricas de tempo e atraso usam somente tarefas com status Concluída.
+  - data_conclusao não pode ser anterior a data_criacao (TaskValidationError).
+  - Concluir exatamente no prazo não é atraso.
+  - Sem base de cálculo, médias e taxas retornam 0.0.
+
+scenarios:
+  - {id: 1, name: Sucesso na extração de métricas}
+  - {id: 2, name: Erro crítico de validação de dados, raises: TaskValidationError}
+  - {id: 3, name: Casos de borda, expects: 0.0}
